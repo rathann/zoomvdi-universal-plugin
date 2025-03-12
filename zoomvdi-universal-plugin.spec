@@ -5,11 +5,11 @@
 %bcond_without bundled_qt5
 %global bundled_qt_version 5.15.17
 
-%global vdi_version 6.1.12
+%global vdi_version 6.2.10
 
 Summary: Zoom thin client plugin for VMware Horizon
 Name: zoomvdi-universal-plugin
-Version: %{vdi_version}.25370
+Version: %{vdi_version}.25600
 Release: 1
 URL: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0063810
 Source0: https://cdn.zoom.us/prod/vdi/%{version}/zoomvdi-universal-plugin-centos_%{vdi_version}.rpm#/%{name}-%{version}.x86_64.rpm
@@ -110,6 +110,9 @@ ln -s ../../bin/true %{buildroot}%{_libdir}/%{name}/getbssid.sh
 /usr/lib/vmware/view/vdpService/libZoomMediaVmware.so
 
 %changelog
+* Wed Mar 12 2025 Dominik Mierzejewski <dominik@greysector.net> 6.2.10.25600-1
+- update to VDI release 6.2.10
+
 * Tue Dec 03 2024 Dominik Mierzejewski <dominik@greysector.net> 6.1.12.25370-1
 - update to VDI release 6.1.12
 
