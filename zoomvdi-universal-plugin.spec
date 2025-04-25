@@ -10,7 +10,7 @@
 Summary: Zoom thin client plugin for VMware Horizon
 Name: zoomvdi-universal-plugin
 Version: %{vdi_version}.25600
-Release: 1
+Release: 2
 URL: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0063810
 Source0: https://cdn.zoom.us/prod/vdi/%{version}/zoomvdi-universal-plugin-centos_%{vdi_version}.rpm#/%{name}-%{version}.x86_64.rpm
 License: Zoom
@@ -19,7 +19,7 @@ BuildRequires: chrpath
 BuildRequires: crudini
 BuildRequires: execstack
 Requires: libmpg123.so.0()(64bit)
-Requires: vmware-horizon-client-pcoip
+Requires: (vmware-horizon-client-pcoip or omnissa-horizon-client-pcoip)
 Provides: bundled(ffmpeg) = 5.1
 Provides: bundled(libicu) = 56.1
 Provides: bundled(openvino)
@@ -96,10 +96,11 @@ popd
 %build
 
 %install
-install -dm755 %{buildroot}{/etc/zoomvdi,%{_libdir}/%{name},/usr/lib/vmware/view/vdpService}
+install -dm755 %{buildroot}{/etc/zoomvdi,%{_libdir}/%{name},/usr/lib/{omnissa/horizon,vmware/view}/vdpService}
 install -pm644 etc/zoomvdi/ZoomMedia.ini %{buildroot}/etc/zoomvdi
 cp -pr usr/lib/%{name} %{buildroot}%{_libdir}
 ln -s ../../../../%{_lib}/%{name}/libZoomPlugin.so %{buildroot}/usr/lib/vmware/view/vdpService/libZoomMediaVmware.so
+ln -s ../../../../%{_lib}/%{name}/libZoomPlugin.so %{buildroot}/usr/lib/omnissa/horizon/vdpService/libZoomMediaVmware.so
 
 ln -s ../libmpg123.so.0 %{buildroot}%{_libdir}/%{name}/libmpg123.so
 ln -s ../../bin/true %{buildroot}%{_libdir}/%{name}/getbssid.sh
@@ -108,8 +109,12 @@ ln -s ../../bin/true %{buildroot}%{_libdir}/%{name}/getbssid.sh
 /etc/zoomvdi/ZoomMedia.ini
 %{_libdir}/%{name}
 /usr/lib/vmware/view/vdpService/libZoomMediaVmware.so
+/usr/lib/omnissa/horizon/vdpService/libZoomMediaVmware.so
 
 %changelog
+* Fri Apr 25 2025 Dominik Mierzejewski <dominik@greysector.net> 6.2.10.25600-2
+- support the new Omnissa Horizon client, too
+
 * Wed Mar 12 2025 Dominik Mierzejewski <dominik@greysector.net> 6.2.10.25600-1
 - update to VDI release 6.2.10
 
