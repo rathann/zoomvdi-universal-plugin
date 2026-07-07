@@ -3,13 +3,13 @@
 %global _build_id_links alldebug
 
 %bcond_without bundled_qt5
-%global bundled_qt_version 5.15.17
+%global bundled_qt_version 5.15.19
 
-%global vdi_version 6.2.16
+%global vdi_version 6.6.11
 
 Summary: Zoom thin client plugin for VMware Horizon
 Name: zoomvdi-universal-plugin
-Version: %{vdi_version}.26330
+Version: %{vdi_version}.26890
 Release: 1
 URL: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0063810
 Source0: https://cdn.zoom.us/prod/vdi/%{version}/zoomvdi-universal-plugin-centos_%{vdi_version}.rpm#/%{name}-%{version}.x86_64.rpm
@@ -28,11 +28,12 @@ Obsoletes: zoomvmwareplugin < 6.1.12
 %if %{with bundled_qt5}
 Provides: bundled(qt5-qtbase) = %{bundled_qt_version}
 Provides: bundled(qt5-qtbase-gui) = %{bundled_qt_version}
+Provides: bundled(qt5-qtdeclarative) = %{bundled_qt_version}
 Provides: bundled(qt5-qtimageformats) = %{bundled_qt_version}
 Provides: bundled(qt5-qtquickcontrols) = %{bundled_qt_version}
 Provides: bundled(qt5-qtquickcontrols2) = %{bundled_qt_version}
-Provides: bundled(qt5-qtremoteobjects) = %{bundled_qt_version}
-Provides: bundled(qt5-qtscript) = %{bundled_qt_version}
+Provides: bundled(qt5-qtsvg) = %{bundled_qt_version}
+Provides: bundled(qt5-qtwayland) = %{bundled_qt_version}
 Provides: bundled(qt5-qtx11extras) = %{bundled_qt_version}
 
 # Qt5 cannot be unbundled as the application uses private APIs
@@ -69,9 +70,12 @@ for f in \
   aomhost \
   crash_processor \
   zoom \
+  libaomagent.so \
   libdvf.so \
   libquazip.so \
   Qt/lib/libicu{data,i18n,uc}.so.56 \
+  Zoom_VDI_Plugin_Management \
+  ZoomClips \
 ; do chrpath -d $f ; done
 rm -r \
 %if ! %{with bundled_qt5}
@@ -112,6 +116,10 @@ ln -s ../../bin/true %{buildroot}%{_libdir}/%{name}/getbssid.sh
 /usr/lib/omnissa/horizon/vdpService/libZoomMediaVmware.so
 
 %changelog
+* Tue Jul 07 2026 Dominik Mierzejewski <dominik@greysector.net> 6.6.11.26890-1
+- update to VDI release 6.6.11
+- update bundled Qt5 details
+
 * Mon Jul 14 2025 Dominik Mierzejewski <dominik@greysector.net> 6.2.16.26330-1
 - update to VDI release 6.2.16
 
