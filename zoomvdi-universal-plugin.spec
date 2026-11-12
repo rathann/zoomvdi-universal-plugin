@@ -2,14 +2,14 @@
 %define debug_package          %{nil}
 %global _build_id_links alldebug
 
-%bcond_without bundled_qt5
-%global bundled_qt_version 5.15.19
+%bcond_without bundled_qt6
+%global bundled_qt_version 6.8.6
 
-%global vdi_version 6.6.11
+%global vdi_version 7.0.11
 
 Summary: Zoom thin client plugin for VMware Horizon
 Name: zoomvdi-universal-plugin
-Version: %{vdi_version}.26890
+Version: %{vdi_version}.27050
 Release: 1
 URL: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0063810
 Source0: https://cdn.zoom.us/prod/vdi/%{version}/zoomvdi-universal-plugin-centos_%{vdi_version}.rpm#/%{name}-%{version}.x86_64.rpm
@@ -19,25 +19,19 @@ BuildRequires: chrpath
 BuildRequires: crudini
 BuildRequires: execstack
 Requires: libmpg123.so.0()(64bit)
-Requires: (vmware-horizon-client-pcoip or omnissa-horizon-client-pcoip)
+Requires: omnissa-horizon-client-pcoip
 Provides: bundled(ffmpeg) = 5.1
-Provides: bundled(libicu) = 56.1
+Provides: bundled(libicu) = 73.2
 Provides: bundled(openvino)
-Provides: zoomvmwareplugin = %{version}-%{release}
-Obsoletes: zoomvmwareplugin < 6.1.12
-%if %{with bundled_qt5}
-Provides: bundled(qt5-qtbase) = %{bundled_qt_version}
-Provides: bundled(qt5-qtbase-gui) = %{bundled_qt_version}
-Provides: bundled(qt5-qtdeclarative) = %{bundled_qt_version}
-Provides: bundled(qt5-qtimageformats) = %{bundled_qt_version}
-Provides: bundled(qt5-qtquickcontrols) = %{bundled_qt_version}
-Provides: bundled(qt5-qtquickcontrols2) = %{bundled_qt_version}
-Provides: bundled(qt5-qtsvg) = %{bundled_qt_version}
-Provides: bundled(qt5-qtwayland) = %{bundled_qt_version}
-Provides: bundled(qt5-qtx11extras) = %{bundled_qt_version}
+%if %{with bundled_qt6}
+Provides: bundled(qt6-qt5compat) = %{bundled_qt_version}
+Provides: bundled(qt6-qtbase) = %{bundled_qt_version}
+Provides: bundled(qt6-qtdeclarative) = %{bundled_qt_version}
+Provides: bundled(qt6-qtshadertools) = %{bundled_qt_version}
+Provides: bundled(qt6-qtsvg) = %{bundled_qt_version}
 
-# Qt5 cannot be unbundled as the application uses private APIs
-%global __requires_exclude ^lib\(avcodec\|avformat\|avutil\|swresample\|icu\(data\|i18n\|uc\)\|Qt5\(3D\(Animation\|Core\|Input\|Logic\|Quick\|QuickScene2D\|Render\)\|Bodymovin\|Concurrent\|Core\|DBus\|EglFSDeviceIntegration\|EglFsKmsSupport\|Gamepad\|Gui\|Multimedia\|Network\|Qml\|Quick\|RemoteObjects\|Script\|Sql\|Svg\|WaylandClient\|Widgets\|X11Extras\|XcbQpa\|XmlPatterns\)\|vdpservice\)
+# Qt6 cannot be unbundled as the application uses private APIs
+%global __requires_exclude ^lib\(avcodec\|avformat\|avutil\|swresample\|icu\(data\|i18n\|uc\)\|Qt6\(Bodymovin\|Core5Compat\|Core\|DBus\|EglFSDeviceIntegration\|EglFsKmsGbmSupport\|EglFsKmsSupport\|Gui\|Labs\(Animation\|FolderListModel\|Platform\|QmlModels\|Settings\|SharedImage\|WavefrontMesh\)\|Network\|OpenGL\|Qml\|Quick\|ShaderTools\|Sql\|Svg\|Test\|Wayland\(Client\|EglClientHwIntegration\)\|Widgets\|WlShellIntegration\|XcbQpa\)\|vdpservice\)
 %else
 %global __requires_exclude ^lib\(avcodec\|avformat\|avutil\|swresample\|icu\(data\|i18n\|uc\)\|vdpservice\)
 %endif
@@ -73,12 +67,13 @@ for f in \
   libaomagent.so \
   libdvf.so \
   libquazip.so \
-  Qt/lib/libicu{data,i18n,uc}.so.56 \
+  Qt/lib/libicu{data,i18n,uc}.so.73 \
+  Qt/plugins/platforminputcontexts/libfcitx5platforminputcontextplugin.so \
   Zoom_VDI_Plugin_Management \
   ZoomClips \
 ; do chrpath -d $f ; done
 rm -r \
-%if ! %{with bundled_qt5}
+%if ! %{with bundled_qt6}
   Qt \
   libquazip.so \
   qt.conf \
@@ -103,7 +98,6 @@ popd
 install -dm755 %{buildroot}{/etc/zoomvdi,%{_libdir}/%{name},/usr/lib/{omnissa/horizon,vmware/view}/vdpService}
 install -pm644 etc/zoomvdi/ZoomMedia.ini %{buildroot}/etc/zoomvdi
 cp -pr usr/lib/%{name} %{buildroot}%{_libdir}
-ln -s ../../../../%{_lib}/%{name}/libZoomPlugin.so %{buildroot}/usr/lib/vmware/view/vdpService/libZoomMediaVmware.so
 ln -s ../../../../%{_lib}/%{name}/libZoomPlugin.so %{buildroot}/usr/lib/omnissa/horizon/vdpService/libZoomMediaVmware.so
 
 ln -s ../libmpg123.so.0 %{buildroot}%{_libdir}/%{name}/libmpg123.so
@@ -112,10 +106,14 @@ ln -s ../../bin/true %{buildroot}%{_libdir}/%{name}/getbssid.sh
 %files
 /etc/zoomvdi/ZoomMedia.ini
 %{_libdir}/%{name}
-/usr/lib/vmware/view/vdpService/libZoomMediaVmware.so
 /usr/lib/omnissa/horizon/vdpService/libZoomMediaVmware.so
 
 %changelog
+* Thu Nov 12 2026 Dominik Mierzejewski <dominik@greysector.net> 7.0.11-27050-1
+- update to VDI release 7.0.11
+- update bundled Qt6 details
+- drop VMware Horizon client support
+
 * Tue Jul 07 2026 Dominik Mierzejewski <dominik@greysector.net> 6.6.11.26890-1
 - update to VDI release 6.6.11
 - update bundled Qt5 details
